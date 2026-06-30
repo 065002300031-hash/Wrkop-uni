@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse  # Tambahan untuk handle file HTML
 from sqlalchemy.orm import Session
 import models
 import schemas
@@ -16,6 +17,24 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ==========================================================
+# ROUTE UNTUK MENAMPILKAN FRONTEND
+# ==========================================================
+
+@app.get("/")
+def read_index():
+    # Mengirimkan file index.html saat mengakses URL utama
+    return FileResponse("index.html")
+
+@app.get("/dashboard")
+def read_dashboard():
+    # Mengirimkan file dashboard.html saat mengakses /dashboard
+    return FileResponse("dashboard.html")
+
+# ==========================================================
+# ENDPOINT API (SAMA SEPERTI SEBELUMNYA)
+# ==========================================================
 
 @app.get("/api/menus", response_model=list[schemas.Menu])
 def read_menus(db: Session = Depends(get_db)):
