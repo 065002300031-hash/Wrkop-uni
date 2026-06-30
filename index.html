@@ -60,7 +60,7 @@
                     <span id="txt-kategori-title" class="text-xs font-extrabold uppercase text-gray-400 tracking-wider mr-2 hidden sm:inline">Kategori Makanan</span>
                 </div>
 
-                <div id="menu-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                <div id="menu-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
             </div>
 
             <div id="sub-screen-payment" class="hidden bg-white rounded-3xl p-6 border shadow-sm space-y-6">
@@ -313,20 +313,19 @@
     </div>
 
     <script>
-        // URL backend API kita
         const API_URL = '/api';
 
         const fallbackProduk = [
-            { id: 1, nama: "Indomie Goreng Double + Telur Kampung", harga: 19000, kategori: "makanan", prepTime: 5, foto: "https://images.unsplash.com/photo-1612927601601-6638404737ce?w=400", deskripsi: "Dua bungkus mi instan goreng dimasak kaldu bumbu disajikan dengan telur setengah matang." },
-            { id: 2, nama: "Kopi Susu Es Kental Manis Legit", harga: 11000, kategori: "minuman", prepTime: 2, foto: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400", deskripsi: "Seduhan biji kopi robusta pekat dipadukan dengan kental manis putih porsi es batu melimpah." },
-            { id: 3, nama: "Roti Bakar Cokelat Keju Kraft", harga: 14000, kategori: "snack", prepTime: 4, foto: "https://images.unsplash.com/photo-1584946914531-979450c56020?w=400", deskripsi: "Roti bakar lapis margarine isi meses cokelat pekat bertabur gunungan keju kraft gurih." }
+            { id: 1, nama: "Indomie Goreng Double + Telur Kampung", harga: 19000, kategori: "makanan", prepTime: 5 },
+            { id: 2, nama: "Kopi Susu Es Kental Manis Legit", harga: 11000, kategori: "minuman", prepTime: 2 },
+            { id: 3, nama: "Roti Bakar Cokelat Keju Kraft", harga: 14000, kategori: "snack", prepTime: 4 }
         ];
 
         let produkData = [];
         let keranjang = {}; 
         let jenisLayanan = 'dine-in';
         let countdownInterval; 
-        let pollingInterval; // Variabel baru buat nampung interval cek status pesanan
+        let pollingInterval;
         let totalWaktuDetikBerdetak = 0;
         let isLoggedIn = false; 
 
@@ -340,7 +339,6 @@
             const meja = params.get('meja') || "05";
             document.getElementById('table-info').innerHTML = `<i class="fa-solid fa-chair mr-1 text-amber-300"></i> Alamat Jalur Akses: <strong>Meja ${meja} (Dine-In Area)</strong>`;
             
-            // Narik data ke database (bukan localstorage lagi)
             loadDynamicMenus();
         };
 
@@ -355,9 +353,7 @@
                             nama: m.name,
                             harga: m.price,
                             kategori: m.category.toLowerCase(),
-                            prepTime: m.prep_time,
-                            foto: m.image,
-                            deskripsi: m.description
+                            prepTime: m.prep_time
                         }));
                     } else {
                         produkData = fallbackProduk;
@@ -366,7 +362,7 @@
                     produkData = fallbackProduk;
                 }
             } catch (error) {
-                console.error("Gagal konek ke backend API, fallback ke data lokal.", error);
+                console.error(error);
                 produkData = fallbackProduk;
             }
             
@@ -386,20 +382,13 @@
 
             filtered.forEach(p => {
                 container.innerHTML += `
-                    <div class="bg-white rounded-2xl border border-gray-100 p-4 flex gap-4 shadow-sm hover:shadow-md transition-all duration-200">
-                        <img src="${p.foto}" alt="${p.nama}" class="w-24 h-24 rounded-xl object-cover bg-gray-50 flex-shrink-0 border">
-                        <div class="flex-1 min-w-0 text-left flex flex-col justify-between">
-                            <div>
-                                <div class="flex justify-between items-start gap-2">
-                                    <h3 class="font-extrabold text-gray-800 text-sm leading-tight">${p.nama}</h3>
-                                    <span class="text-amber-800 font-black text-xs bg-amber-50 px-2 py-1 rounded-md flex-shrink-0">Rp ${p.harga.toLocaleString('id-ID')}</span>
-                                </div>
-                                <p class="text-gray-400 text-[11px] leading-relaxed mt-1 line-clamp-2">${p.deskripsi}</p>
-                            </div>
-                            <div class="flex justify-between items-center mt-2 pt-2 border-t border-gray-50">
-                                <span class="text-[10px] text-slate-400 font-bold bg-slate-100 px-2 py-0.5 rounded"><i class="fa-solid fa-clock text-amber-800 mr-1"></i>Durasi: ±${p.prepTime} mnt</span>
-                                <button onclick="tambahKeKeranjang(${p.id})" class="bg-amber-800 hover:bg-amber-900 text-white text-[11px] font-bold px-4 py-1.5 rounded-xl transition-all shadow-sm">+ Tambah Menu</button>
-                            </div>
+                    <div class="bg-white rounded-2xl border border-gray-100 p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-all duration-200">
+                        <div class="flex justify-between items-start gap-2 mb-3">
+                            <h3 class="font-extrabold text-gray-800 text-sm leading-tight">${p.nama}</h3>
+                            <span class="text-amber-800 font-black text-xs bg-amber-50 px-2 py-1 rounded-md flex-shrink-0">Rp ${p.harga.toLocaleString('id-ID')}</span>
+                        </div>
+                        <div class="flex justify-end border-t border-gray-50 pt-3">
+                            <button onclick="tambahKeKeranjang(${p.id})" class="bg-amber-800 hover:bg-amber-900 text-white text-[11px] font-bold px-4 py-1.5 rounded-xl transition-all shadow-sm w-full">+ Tambah Menu</button>
                         </div>
                     </div>`;
             });
@@ -557,7 +546,6 @@
         }
 
         async function simulasiBayarLunas() {
-            // Setup Format Order ID Real
             let finalOrderId = "";
             const boxKasirTerbuka = !document.getElementById('pay-box-kasir').classList.contains('hidden');
             if (boxKasirTerbuka) {
@@ -566,7 +554,6 @@
                 finalOrderId = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
             }
             
-            // Siapin Payload Buat Dikirim Ke Backend
             let listTeks = [];
             Object.keys(keranjang).forEach(id => {
                 const p = produkData.find(prod => prod.id == id);
@@ -586,7 +573,6 @@
                 total_price: totalHarga
             };
 
-            // Tembak Data Ke API
             try {
                 const response = await fetch(`${API_URL}/orders`, {
                     method: 'POST',
@@ -596,10 +582,8 @@
                 if (!response.ok) throw new Error("Gagal ngirim pesanan ke server!");
             } catch (error) {
                 console.error(error);
-                // Biar tetep bisa disimulasikan kalau backend belum nyala
             }
 
-            // Ganti UI Layar
             document.getElementById('sub-screen-payment').classList.add('hidden');
             document.getElementById('sub-screen-tracking').classList.remove('hidden');
             document.getElementById('receipt-order-id').innerText = `ID TRANSAKSI: #${finalOrderId}`;
@@ -627,7 +611,6 @@
                 }
             }, 1000);
 
-            // Setup Kuitansi
             document.getElementById('receipt-date').innerText = `Tanggal: ${new Date().toLocaleDateString('id-ID')} ${new Date().toLocaleTimeString('id-ID')}`;
             document.getElementById('receipt-type').innerText = jenisLayanan.toUpperCase();
             document.getElementById('receipt-location').innerText = customerInfo;
@@ -641,11 +624,9 @@
             });
             document.getElementById('receipt-total').innerText = document.getElementById('total-cost').innerText;
 
-            // Panggil fungsi polling buat nunggu di-acc admin
             mulaiPollingStatus(finalOrderId);
         }
 
-        // Fungsi baru buat ngecek status pesanan ke API
         function mulaiPollingStatus(orderCode) {
             clearInterval(pollingInterval);
             pollingInterval = setInterval(async () => {
@@ -655,15 +636,14 @@
                         const data = await res.json();
                         applyRealtimeStatus(data.status);
                         
-                        // Kalo status 4 (Selesai), stop polling
                         if (data.status === 4) {
                             clearInterval(pollingInterval);
                         }
                     }
                 } catch(e) {
-                    // Abaikan error jaringan sementara
+                    console.error(e);
                 }
-            }, 3000); // Polling tiap 3 detik
+            }, 3000);
         }
 
         function displayRealtimeClock(sec) {
@@ -673,8 +653,6 @@
         }
 
         function simulasiPerpindahanAlurOtomatis(sisaDetik) {
-            // Fungsi ini sekarang digantikan sepenuhnya oleh applyRealtimeStatus dari API
-            // Tetep dibiarin kosong atau buat jaga-jaga kalau backend mati
         }
 
         function applyRealtimeStatus(status) {
@@ -691,7 +669,6 @@
                 document.getElementById('step-4').className = "step-item font-bold text-green-700 text-xs flex items-center gap-2";
                 document.getElementById('dot-4').className = "w-5 h-5 bg-green-700 text-white rounded-full flex items-center justify-center font-bold text-[10px]";
                 
-                // Pangkas waktu jadi 0 karena udah selesai
                 totalWaktuDetikBerdetak = 0; 
                 document.getElementById('countdown-timer').textContent = "SELESAI!"; 
             }
@@ -706,7 +683,6 @@
             document.getElementById('sub-screen-tracking').className = "hidden";
             document.getElementById('sub-screen-menu').className = "space-y-6";
             
-            // Reset UI step tracking
             document.getElementById('step-2').className = "step-item text-gray-400 text-xs flex items-center gap-2";
             document.getElementById('dot-2').className = "w-5 h-5 bg-gray-200 text-gray-500 rounded-full flex items-center justify-center font-bold text-[10px]";
             document.getElementById('step-3').className = "step-item text-gray-400 text-xs flex items-center gap-2";
