@@ -80,8 +80,8 @@
                     </div>
 
                     <div id="pay-box-qris" class="hidden bg-gray-50 p-4 rounded-2xl border text-center space-y-3">
-                        <p class="text-xs font-bold text-gray-700">SCAN INTEGRATED BARCODE QRIS</p>
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=WarkopDigitalRealtime" class="border bg-white p-2 rounded-xl mx-auto shadow-sm" alt="QRIS">
+                        <p class="text-xs font-bold text-gray-700">SCAN BARCODE QRIS</p>
+                        <img src="https://www.image2url.com/r2/default/images/1782894566755-3814aa36-c337-439f-b5be-11d5549936f3.png" class="border bg-white p-2 rounded-xl mx-auto shadow-sm w-[200px] object-contain" alt="QRIS">
                         <p class="text-[10px] text-gray-400">Mendukung Pembayaran Seluruh E-Wallet & Mobile Banking Indonesia</p>
                     </div>
 
@@ -106,16 +106,16 @@
                 </div>
 
                 <div class="border-t pt-4 text-right">
-                    <button onclick="simulasiBayarLunas()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-3.5 rounded-xl text-xs tracking-wider uppercase shadow-md transition-all">
-                        <i class="fa-solid fa-circle-check mr-1.5"></i> Simulasikan Transaksi Sukses Lunas
+                    <button onclick="prosesPesanan()" class="bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-3.5 rounded-xl text-xs tracking-wider uppercase shadow-md transition-all">
+                        <i class="fa-solid fa-circle-check mr-1.5"></i> Konfirmasi & Kirim Pesanan
                     </button>
                 </div>
             </div>
 
             <div id="sub-screen-tracking" class="hidden bg-white rounded-3xl p-6 border shadow-sm space-y-6">
                 <div class="text-center max-w-md mx-auto space-y-2">
-                    <div class="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-2xl mx-auto shadow-inner"><i class="fa-solid fa-circle-check"></i></div>
-                    <h3 class="text-lg font-black text-gray-800">Pembayaran Selesai Diverifikasi!</h3>
+                    <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-2xl mx-auto shadow-inner"><i class="fa-solid fa-clock"></i></div>
+                    <h3 class="text-lg font-black text-gray-800">Pesanan Berhasil Dikirim!</h3>
                     <p class="text-xs text-gray-400">Silakan pantau pergerakan sisa waktu berdetak mundur pengerjaan menu Anda di bawah.</p>
                 </div>
 
@@ -130,7 +130,7 @@
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 sm:gap-4 relative px-4">
                         <div id="step-1" class="step-item font-bold text-amber-800 text-xs flex items-center gap-2">
                             <span class="w-5 h-5 bg-amber-800 text-white rounded-full flex items-center justify-center font-bold text-[10px]">✓</span>
-                            Pesanan Diverifikasi Lunas
+                            Menunggu Verifikasi Pembayaran
                         </div>
                         <div id="step-2" class="step-item text-gray-400 text-xs flex items-center gap-2">
                             <span id="dot-2" class="w-5 h-5 bg-gray-200 text-gray-500 rounded-full flex items-center justify-center font-bold text-[10px]">2</span>
@@ -210,7 +210,7 @@
                 <div>
                     <label class="block font-bold text-gray-700 mb-1.5">Pilih Jalur Saluran Pembayaran:</label>
                     <select id="payment-method" onchange="handlePaymentMethodChange(this.value)" class="w-full p-2.5 border rounded-xl bg-white font-medium focus:outline-amber-800">
-                        <option value="QRIS">QRIS (Otomatis & Cepat)</option>
+                        <option value="QRIS">QRIS</option>
                         <option value="Transfer Bank">Transfer Bank VA (Pilih Bank)</option>
                         <option value="Bayar di Kasir">Bayar Langsung Ke Kasir</option>
                     </select>
@@ -245,7 +245,7 @@
     </div>
 
     <footer class="bg-slate-800 text-slate-400 py-4 px-6 border-t border-slate-700 text-center text-xs">
-        &copy; 2026 Perusahaan Usaha Warkop Digital Mandiri Sesuai Ketentuan User Requirement Dokumen. All Rights Reserved.
+        &copy; 2026 Perusahaan Usaha Warkop Digital Mandiri. All Rights Reserved.
     </footer>
 
     <div id="login-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
@@ -545,7 +545,7 @@
             document.getElementById('sub-screen-payment').classList.remove('hidden');
         }
 
-        async function simulasiBayarLunas() {
+        async function prosesPesanan() {
             let finalOrderId = "";
             const boxKasirTerbuka = !document.getElementById('pay-box-kasir').classList.contains('hidden');
             if (boxKasirTerbuka) {
@@ -650,9 +650,6 @@
             const menit = Math.floor(sec / 60);
             const detik = sec % 60;
             document.getElementById('countdown-timer').textContent = `${menit < 10 ? '0' + menit : menit}:${detik < 10 ? '0' + detik : detik}`;
-        }
-
-        function simulasiPerpindahanAlurOtomatis(sisaDetik) {
         }
 
         function applyRealtimeStatus(status) {
