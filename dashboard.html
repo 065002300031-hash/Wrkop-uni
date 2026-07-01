@@ -60,7 +60,7 @@
                         <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
                         <span class="text-slate-300 font-medium">Petugas: <strong class="text-white">Supervisor Admin</strong></span>
                     </div>
-                    <button onclick="lokasiSimulasiPembeli()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-4 py-2 rounded-xl text-xs shadow transition-all">
+                    <button onclick="bukaWebPembeli()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-4 py-2 rounded-xl text-xs shadow transition-all">
                         <i class="fa-solid fa-external-link mr-1.5"></i> Buka Web Pembeli
                     </button>
                     <button onclick="handleLogout()" class="bg-red-600/20 hover:bg-red-600 border border-red-500/30 text-red-400 hover:text-white px-3 py-2 rounded-xl text-xs transition-all flex items-center justify-center" title="Keluar">
@@ -222,7 +222,7 @@
         const API_URL = '/api';
         let bypassClickCount = 0;
         let menuDataCache = [];
-        let currentActiveOrderId = null; // Nyimpen ID order yg lagi diurus (Database ID)
+        let currentActiveOrderId = null; 
         let orderPollingInterval;
 
         function bypassLogin() {
@@ -270,9 +270,6 @@
             }
         };
 
-        // =====================================
-        // CRUD MANAJEMEN MENU VIA API
-        // =====================================
         async function fetchMenus() {
             try {
                 const res = await fetch(`${API_URL}/menus`);
@@ -281,7 +278,7 @@
                     renderMenuTable();
                 }
             } catch(e) {
-                console.error("Gagal load menu dari backend", e);
+                console.error(e);
             }
         }
 
@@ -330,14 +327,12 @@
 
             try {
                 if (id) {
-                    // Update
                     await fetch(`${API_URL}/menus/${id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
                 } else {
-                    // Create
                     await fetch(`${API_URL}/menus`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -347,7 +342,7 @@
                 resetMenuForm();
                 fetchMenus();
             } catch (e) {
-                console.error("Gagal save menu", e);
+                console.error(e);
             }
         }
 
@@ -357,7 +352,6 @@
 
             document.getElementById('menu-id').value = menu.id;
             document.getElementById('menu-name').value = menu.name;
-            // Handle case insensitive category mapping
             const catSelect = document.getElementById('menu-category');
             for(let i=0; i<catSelect.options.length; i++) {
                 if(catSelect.options[i].value.toLowerCase() === menu.category.toLowerCase()) {
@@ -377,7 +371,7 @@
                     await fetch(`${API_URL}/menus/${id}`, { method: 'DELETE' });
                     fetchMenus();
                 } catch(e) {
-                    console.error("Gagal hapus menu", e);
+                    console.error(e);
                 }
             }
         }
@@ -392,13 +386,10 @@
             document.getElementById('btn-cancel-edit').classList.add('hidden');
         }
 
-        // =====================================
-        // SISTEM POLLING ORDERAN & STATUS
-        // =====================================
         function mulaiPollingOrders() {
             clearInterval(orderPollingInterval);
-            fetchOrders(); // Tembak pertama kali
-            orderPollingInterval = setInterval(fetchOrders, 3000); // Tembak tiap 3 detik
+            fetchOrders(); 
+            orderPollingInterval = setInterval(fetchOrders, 3000); 
         }
 
         async function fetchOrders() {
@@ -409,18 +400,15 @@
                     prosesDataOrder(orders);
                 }
             } catch(e) {
-                console.error("Gagal ambil data order", e);
+                console.error(e);
             }
         }
 
         function prosesDataOrder(orders) {
-            // Kalkulasi Omzet
             let totalOmzet = 0;
             let antreanAktif = 0;
             let orderanDiproses = null;
 
-            // Karena data API di-sort dari paling baru, kita cari orderan terlama yg belum selesai (status 1, 2, atau 3)
-            // Jadi kita reverse array-nya buat dapet antrean pertama yg masuk
             const reversedOrders = [...orders].reverse();
 
             reversedOrders.forEach(order => {
@@ -428,18 +416,15 @@
                     totalOmzet += order.total_price;
                 } else {
                     antreanAktif++;
-                    // Ambil 1 order pertama yg aktif buat dimunculin di card
                     if (!orderanDiproses) {
                         orderanDiproses = order;
                     }
                 }
             });
 
-            // Update statistik
             document.getElementById('stat-omzet').innerText = "Rp " + totalOmzet.toLocaleString('id-ID');
             document.getElementById('stat-antrean').innerText = antreanAktif + " Pesanan";
 
-            // Update UI Card
             if (orderanDiproses) {
                 tampilkanCardOrderan(orderanDiproses);
             } else {
@@ -448,7 +433,7 @@
         }
 
         function tampilkanCardOrderan(order) {
-            currentActiveOrderId = order.id; // Nyimpen ID database
+            currentActiveOrderId = order.id; 
             document.getElementById('admin-empty-state').classList.add('hidden');
             document.getElementById('admin-active-order-card').classList.remove('hidden');
 
@@ -460,23 +445,22 @@
             const listContainer = document.getElementById('lbl-order-menu-details');
             listContainer.innerHTML = order.items_summary.split(', ').map(item => `<div class="py-0.5">• ${item}</div>`).join('');
 
-            // Setup tombol dan teks status berdasarkan API status
             const btnMasak = document.getElementById('btn-aksi-masak');
             const btnSiap = document.getElementById('btn-aksi-siap');
             const btnSelesai = document.getElementById('btn-aksi-selesai');
             const statusText = document.getElementById('lbl-order-status-text');
 
-            if (order.status === 1) { // Masuk/Pending
+            if (order.status === 1) { 
                 statusText.innerHTML = '<i class="fa-solid fa-circle-notch text-amber-500 animate-spin mr-1"></i> Menunggu Verifikasi Aksi Admin Dapur';
                 btnMasak.disabled = false; btnMasak.className = "bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 uppercase tracking-wide transition-colors shadow-lg";
                 btnSiap.disabled = true; btnSiap.className = "bg-slate-700 text-slate-500 font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 uppercase tracking-wide cursor-not-allowed";
                 btnSelesai.disabled = true; btnSelesai.className = "bg-slate-700 text-slate-500 font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 uppercase tracking-wide cursor-not-allowed";
-            } else if (order.status === 2) { // Dimasak
+            } else if (order.status === 2) { 
                 statusText.innerHTML = '<i class="fa-solid fa-fire-burner text-amber-500 mr-1"></i> Sedang Dimasak Di Dapur';
                 btnMasak.disabled = true; btnMasak.className = "bg-slate-700 text-slate-500 font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 uppercase tracking-wide cursor-not-allowed";
                 btnSiap.disabled = false; btnSiap.className = "bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 uppercase tracking-wide transition-colors shadow-lg";
                 btnSelesai.disabled = true; btnSelesai.className = "bg-slate-700 text-slate-500 font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 uppercase tracking-wide cursor-not-allowed";
-            } else if (order.status === 3) { // Siap Hidang/Kirim
+            } else if (order.status === 3) { 
                 statusText.innerHTML = '<i class="fa-solid fa-bell text-blue-500 mr-1"></i> Menunggu Konfirmasi Selesai';
                 btnMasak.disabled = true; btnMasak.className = "bg-slate-700 text-slate-500 font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 uppercase tracking-wide cursor-not-allowed";
                 btnSiap.disabled = true; btnSiap.className = "bg-slate-700 text-slate-500 font-bold py-3 rounded-xl text-xs flex items-center justify-center gap-2 uppercase tracking-wide cursor-not-allowed";
@@ -493,16 +477,14 @@
         async function kirimSinyalKePembeli(statusSinyal) {
             if (!currentActiveOrderId) return;
             try {
-                // Tembak API buat update status pesanan
                 await fetch(`${API_URL}/orders/${currentActiveOrderId}/status`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ status: statusSinyal })
                 });
-                // Langsung fetch data terbaru biar UI ke-refresh seketika
                 fetchOrders();
             } catch(e) {
-                console.error("Gagal update status", e);
+                console.error(e);
             }
         }
 
@@ -516,8 +498,8 @@
             '<p class="text-[9px] text-green-400 mt-0.5"><i class="fa-solid fa-circle-down"></i> Siap Tempel Di Meja</p>';
         }
 
-        function lokasiSimulasiPembeli() {
-            window.open('index.html?meja=05', '_blank');
+        function bukaWebPembeli() {
+            window.open('/?meja=05', '_blank');
         }
     </script>
 </body>
